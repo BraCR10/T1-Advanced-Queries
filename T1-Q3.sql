@@ -1,8 +1,8 @@
 SELECT 
-	M.Name AS [Nombre de marca]
-	, SUM(ISNULL(L.LineTotal,0)) AS [Monto Total]
+	M.Name AS [Name]
+	, SUM(ISNULL(Line.LineTotal,0)) AS [Total]
 FROM dbo.MARCAS AS M
-LEFT JOIN dbo.OITM AS I ON (I.U_Marca=M.Code)
-LEFT JOIN dbo.INV1 AS L ON (L.ItemCode = I.ItemCode)
+LEFT JOIN dbo.OITM AS Item ON (Item.U_Marca=M.Code)
+LEFT JOIN dbo.INV1 AS Line ON (Line.ItemCode=Item.ItemCode)
 GROUP BY M.Name
-ORDER BY [Monto Total] DESC;
+ORDER BY [Total] DESC;
