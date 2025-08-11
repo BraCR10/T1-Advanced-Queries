@@ -34,3 +34,29 @@ LEFT JOIN dbo.OITW AS ITXWH ON (ITXWH.ItemCode=IT.ItemCode)
 LEFT JOIN dbo.OWHS AS WH ON (WH.WhsCode = ITXWH.WhsCode)
 GROUP BY IT.ItemCode,IT.ItemName
 HAVING SUM(ISNULL(ITXWH.OnHand, 0)) > 0;
+
+SELECT 
+    ItemCode,
+    ItemName,
+    ISNULL([01], 0) AS [01],
+    ISNULL([02], 0) AS [02],
+    ISNULL([03], 0) AS [03],
+    ISNULL([04], 0) AS [04],
+    ISNULL([05], 0) AS [05],
+    ISNULL([INT], 0) AS [INT],
+    ISNULL([MP], 0) AS [MP]
+FROM (
+    SELECT 
+        IT.ItemCode,
+        IT.ItemName,
+        ISNULL(WH.WhsCode, '') AS WhsCode,
+        ISNULL(ITXWH.OnHand, 0) AS OnHand
+    FROM dbo.OITM AS IT
+    LEFT JOIN dbo.OITW AS ITXWH ON (ITXWH.ItemCode = IT.ItemCode)
+    LEFT JOIN dbo.OWHS AS WH ON (WH.WhsCode = ITXWH.WhsCode)
+) AS SourceData
+PIVOT (
+    SUM(OnHand) 
+    FOR WhsCode IN ([01], [02], [03], [04], [05], [INT], [MP])
+) AS PivotTable
+WHERE ISNULL([01], 0) + ISNULL([02], 0) + ISNULL([03], 0) + ISNULL([04], 0) + ISNULL([05], 0) + ISNULL([INT], 0) + ISNULL([MP], 0) > 0;
